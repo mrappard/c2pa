@@ -315,6 +315,18 @@ func (v *validator) add(code StatusCode, uri, explain string, err error) {
 	})
 }
 
+// dropStatus removes every recorded status with the given code and URI.
+func (v *validator) dropStatus(uri string, code StatusCode) {
+	kept := v.res.Statuses[:0]
+	for _, e := range v.res.Statuses {
+		if e.Code == code && e.URI == uri {
+			continue
+		}
+		kept = append(kept, e)
+	}
+	v.res.Statuses = kept
+}
+
 func (v *validator) finish() ValidationResult {
 	// The safety net under every path: a context that ended before the report
 	// was complete fails the report, whatever the steps managed to record —
@@ -594,7 +606,13 @@ func (v *validator) validateManifest(m *parsedManifest, store *parsedStore, dept
 			v.res.SignerChain = chain
 		}
 		v.verifyChain(chain, v.signingTrustPool(), verifyTime, signingEKUOK, uri)
-		v.checkRevocation(chain, uri, StatusSigningCredentialRevoked)
+		var stapledAt time.Time
+		if trusted {
+			stapledAt = genTime
+		}
+		if !v.checkStapledOCSP(m, chain, uri, stapledAt) {
+			v.checkRevocation(chain, uri, StatusSigningCredentialRevoked)
+		}
 	}
 
 	// Assertion integrity: each claimed assertion hash must match its box.
