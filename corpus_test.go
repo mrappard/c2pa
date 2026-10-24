@@ -266,6 +266,11 @@ func TestCorpusNegatives(t *testing.T) {
 			if !res.Has(tc.want) {
 				t.Fatalf("want %s; got %v", tc.want, codes(res))
 			}
+			if tc.want == StatusSigningCredentialExpired {
+				if !res.Has(StatusClaimSignatureOutsideValidity) || res.Has(StatusClaimSignatureValidated) {
+					t.Errorf("expired credential: want claimSignature.outsideValidity and no claimSignature.validated; got %v", codes(res))
+				}
+			}
 			if res.Valid != tc.wantValid {
 				t.Errorf("Valid = %v, want %v (statuses %v)", res.Valid, tc.wantValid, codes(res))
 			}
