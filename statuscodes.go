@@ -95,7 +95,10 @@ const (
 	StatusHardBindingMissing         StatusCode = "hardBinding.missing"
 	StatusAlgorithmUnsupported       StatusCode = "algorithm.unsupported"
 	StatusIngredientManifestMismatch StatusCode = "ingredient.manifest.mismatch"
-	StatusGeneralError               StatusCode = "general.error"
+	// StatusIngredientManifestMissing: an ingredient names a manifest the store
+	// does not contain.
+	StatusIngredientManifestMissing StatusCode = "ingredient.manifest.missing"
+	StatusGeneralError              StatusCode = "general.error"
 
 	// CAWG identity assertion failures (CAWG Identity Assertion spec §7.2.2),
 	// recorded at "<manifest label>/<assertion label>". Codes the C2PA core
@@ -215,6 +218,7 @@ var statusSeverity = map[StatusCode]Severity{
 	StatusHardBindingMissing:             SeverityFailure,
 	StatusAlgorithmUnsupported:           SeverityFailure,
 	StatusIngredientManifestMismatch:     SeverityFailure,
+	StatusIngredientManifestMissing:      SeverityFailure,
 	StatusGeneralError:                   SeverityFailure,
 	StatusIdentityCBORInvalid:            SeverityFailure,
 	StatusIdentityAssertionMismatch:      SeverityFailure,
