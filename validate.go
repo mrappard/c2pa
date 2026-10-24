@@ -315,6 +315,28 @@ func (v *validator) add(code StatusCode, uri, explain string, err error) {
 	})
 }
 
+// has reports whether a status with the given code was recorded at uri.
+func (v *validator) has(uri string, code StatusCode) bool {
+	for _, e := range v.res.Statuses {
+		if e.Code == code && e.URI == uri {
+			return true
+		}
+	}
+	return false
+}
+
+// dropStatus removes every recorded status with the given code and URI.
+func (v *validator) dropStatus(uri string, code StatusCode) {
+	kept := v.res.Statuses[:0]
+	for _, e := range v.res.Statuses {
+		if e.Code == code && e.URI == uri {
+			continue
+		}
+		kept = append(kept, e)
+	}
+	v.res.Statuses = kept
+}
+
 func (v *validator) finish() ValidationResult {
 	// The safety net under every path: a context that ended before the report
 	// was complete fails the report, whatever the steps managed to record —
